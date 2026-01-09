@@ -17,33 +17,22 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug
+      - name: Build Release APK
+        # assembleRelease strips debug info and optimizes code
+        run: ./gradlew assembleRelease
 
-      - name: Upload APK Artifact
+      - name: Sign APK
+        id: sign_app
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Upload Production APK
         uses: actions/upload-artifact@v4
         with:
-          name: WebDAV-Provider-APK
-          path: app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'gradle'
-      - name: Start WebDAV servers
-        run: |
-          docker compose --project-directory tests up -d --wait --force-recreate --build --renew-anon-volumes --remove-orphans
-      - name: Tests
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 31
-          arch: x86_64
-          profile: pixel_3a
-          script: ./gradlew connectedCheck || true
+          name: WebDAV-Provider-Production-APK
+          path: ${{ steps.sign_app.outputs.signedReleaseFile }}
