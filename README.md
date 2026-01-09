@@ -9,7 +9,7 @@ through Android's built-in file explorer, as well as other apps on your device.
 
 [<img height=80 alt="Get it on Google Play"
 src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
-/>](https://play.google.com/store/apps/details?id=dev.rocli.android.webdav)
+/>](https://play.google.com/store/apps/details?id=dev.rocli.android.webdav)  
 
 ## Screenshots
 
